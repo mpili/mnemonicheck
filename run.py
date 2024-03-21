@@ -19,6 +19,14 @@ def carica_wordlist() -> list:
 
 word_list_bip39 = carica_wordlist()
 
+def bin_dec_word(word):
+    index = word_list_index[word]
+    return f"{format(index, '011b')} {str(index).rjust(4)} {word}"
+
+def printMnemonic(wordlist):
+    for word in wordlist:
+        print(bin_dec_word(word))
+
 def checksum_length(wordlist): # in hex characters
     num_bits = len(wordlist)/3
     return int(num_bits/4)
@@ -29,10 +37,12 @@ def isValidMnemonic(wordlist):
     for word in wordlist:
         if word not in word_list_bip39:
             print(f"The word '{word}' is not present in the bip 39 wordlist")
-            exit() 
+            exit()
+        index = word_list_index[word] 
         bigNum = (bigNum<<11) + word_list_bip39.index(word)
-    # nhex = format(N, '033x') # include leading zero if needed
+    # print(bigNum)
     nhex = format(bigNum, f'0{n_hex_digit}x') # include leading zero if needed
+    # print(nhex)
     h = hashlib.sha256(binascii.unhexlify(nhex[:-checksum_length(wordlist)])).hexdigest()
     return h[0] == nhex[-1]
 
@@ -51,7 +61,8 @@ def ElaboraMnemonic(mnemonic_string):
     elif isinstance(mnemonic_string, list):
         mnemonic_wordlist = mnemonic_string
     # else:
-    #     print("La variabile non è né una stringa né una lista.")    
+    #     print("La variabile non è né una stringa né una lista.")
+    printMnemonic(mnemonic_wordlist)   
     if len(mnemonic_wordlist) == 11:
         findTwelfthWords(mnemonic_wordlist)
     else:
