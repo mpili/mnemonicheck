@@ -19,27 +19,63 @@ def carica_wordlist() -> list:
 
 word_list_bip39 = carica_wordlist()
 
+def containsonly01(stringa):
+  """
+  Verifica se una stringa contiene solo 0 e 1.
+
+  Parametri:
+    stringa: la stringa da controllare.
+
+  Restituisce:
+    True se la stringa contiene solo 0 e 1, False altrimenti.
+  """
+  for carattere in stringa:
+    if carattere not in "01":
+      return False
+  return True
 def bin_dec_word(word):
     index = word_list_index[word]
     return f"{format(index, '011b')} {str(index).rjust(4)} {word}"
 
+def ToNum(x): # accetta binario, decimale o word bip39, restituisce il numero
+    if isinstance(x, str):
+        if containsonly01(x):
+            return int(x, 2)
+        if x in word_list_bip39:
+            return word_list_index[x]
+        raise ValueError(f"'{x}' is not a valid mnemonic word")
+    if isinstance(x, int):
+        return x
+    raise ValueError(f"'{x}' is not a valid value")
+
+def check_word_present_in_bip39(word):
+    """Checks if a word is present in the BIP-0039 English word list"""
+    if word not in word_list_bip39:
+        raise ValueError(f"'{word}' is not present in the BIP-0039 word list")
+
 def printMnemonic(wordlist):
-    for word in wordlist:
-        print(bin_dec_word(word))
+    for i in range(len(wordlist)):
+        x = wordlist[i]
+        n = ToNum(x)
+        if n < len(word_list_bip39):
+            print(f"{format(n, '011b')} {str(n).rjust(4)} {word_list_bip39[n]}")
+        else:
+            print(f"{format(n, '011b')} {x}")
+            # print(f"{str(i+1).rjust(2)} {word_list_bip39[n]}")
 
 def checksum_length(wordlist): # in hex characters
     num_bits = len(wordlist)/3
     return int(num_bits/4)
 
+
 def isValidMnemonic(wordlist):
     bigNum = 0
     n_hex_digit = int(len(wordlist)*11/4)
     for word in wordlist:
-        if word not in word_list_bip39:
-            print(f"The word '{word}' is not present in the bip 39 wordlist")
-            exit()
+        check_word_present_in_bip39(word)
         index = word_list_index[word] 
-        bigNum = (bigNum<<11) + word_list_bip39.index(word)
+        # bigNum = (bigNum<<11) + word_list_bip39.index(word)
+        bigNum = (bigNum<<11) + index
     # print(bigNum)
     nhex = format(bigNum, f'0{n_hex_digit}x') # include leading zero if needed
     # print(nhex)
@@ -62,8 +98,10 @@ def ElaboraMnemonic(mnemonic_string):
         mnemonic_wordlist = mnemonic_string
     # else:
     #     print("La variabile non è né una stringa né una lista.")
-    printMnemonic(mnemonic_wordlist)   
-    if len(mnemonic_wordlist) == 11:
+    printMnemonic(mnemonic_wordlist)
+    if len(mnemonic_wordlist) == 1:
+        pass
+    elif len(mnemonic_wordlist) == 11:
         findTwelfthWords(mnemonic_wordlist)
     else:
         print("valid" if isValidMnemonic(mnemonic_wordlist) else "non valid")
