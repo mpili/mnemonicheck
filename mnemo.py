@@ -33,6 +33,9 @@ mnemo.py -i
 # -g show bitcan.world glyph
 mnemo.py -g -l YOUTH SOLAR ABANDON COVER URGE TERM LOUD ENGAGE ALL SLOT ABOVE ACCIDENT
 
+# -c find the checksum in the last word
+mnemo.py -c -l 11010010011 00111011000 10010100111 11101000000 10001100010 00001111110 10011001011 01110110101 11110110011 11101101000 10110001110 00000000000
+
 """
 
 word_list_file ="wordlist/english.txt"
