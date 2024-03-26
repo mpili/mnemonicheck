@@ -116,6 +116,20 @@ def findTwelfthWords(wordlist): # trova le 12° parole valide
             n = n+1
             print(n, ' '.join(new_wordlist))
 
+def dropChecksum(word): # converte la parola in binario, rimuove il checksum, restituisce la parola senza il checksum
+    v12th = ToNum(word)
+    binstr = format(v12th, '011b')
+    l = 4 # checksum_length
+    return binstr[0:-l]
+
+def findChecksum(wordlist):
+    w12th = dropChecksum(wordlist[11])
+    for word in word_list_bip39:
+        if dropChecksum(word) == w12th:
+            new_wordlist = wordlist.copy()
+            new_wordlist[11] = word
+            if isValidMnemonic(new_wordlist):
+                print(' '.join(new_wordlist))
 
 def ElaboraMnemonic(mnemonic_string, args):
     if isinstance(mnemonic_string, str):
@@ -130,7 +144,10 @@ def ElaboraMnemonic(mnemonic_string, args):
     elif len(mnemonic_wordlist) == 11:
         findTwelfthWords(mnemonic_wordlist)
     else:
-        print("valid" if isValidMnemonic(mnemonic_wordlist) else "non valid")
+        if args.checksum:
+            findChecksum(mnemonic_wordlist)
+        else:
+            print("valid" if isValidMnemonic(mnemonic_wordlist) else "non valid")
     if args.glyph:
         bitcan.print_bitcan_glyph_array([ToNum(w) for w in mnemonic_wordlist])
 
@@ -164,6 +181,8 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--input', action='store_true', help='enter the words')
 
     parser.add_argument('-g', '--glyph', action='store_true', help='draw the bitcan glyph')
+
+    parser.add_argument('-c', '--checksum', action='store_true', help='find the checksum in the last word')
 
     args = parser.parse_args()
     if not any(vars(args).values()):
