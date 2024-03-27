@@ -116,7 +116,7 @@ def isValidMnemonic(wordlist):
     # return h[0] == nhex[-1]
     return h[:chklen] == nhex[-chklen:]
 
-def findTwelfthWords(wordlist): # trova le 12° parole valide 
+def findLastWord(wordlist): # trova le 12° o 24° parole valide 
     n=0
     for word in word_list_bip39:
         new_wordlist = wordlist.copy()
@@ -150,8 +150,8 @@ def ElaboraMnemonic(mnemonic_string, args):
     #     print("La variabile non è né una stringa né una lista.")
     if len(mnemonic_wordlist) == 1:
         pass
-    elif len(mnemonic_wordlist) == 11:
-        findTwelfthWords(mnemonic_wordlist)
+    elif len(mnemonic_wordlist) in [11,23]:
+        findLastWord(mnemonic_wordlist)
     else:
         if args.checksum:
             mnemonic_wordlist = findChecksum(mnemonic_wordlist)
