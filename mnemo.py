@@ -36,6 +36,10 @@ mnemo.py -g -l YOUTH SOLAR ABANDON COVER URGE TERM LOUD ENGAGE ALL SLOT ABOVE AC
 # -c find the checksum in the last word
 mnemo.py -c -l 11010010011 00111011000 10010100111 11101000000 10001100010 00001111110 10011001011 01110110101 11110110011 11101101000 10110001110 00000000000
 
+
+# with 24 words
+mnemo.py -l powder door become soldier broccoli surface original flash regular quality ensure disorder such flee room uniform scan sport drift ranch duty radar giraffe decade
+
 """
 
 word_list_file ="wordlist/english.txt"
@@ -88,7 +92,7 @@ def printMnemonic(wordlist):
         x = wordlist[i]
         n = ToNum(x)
         if n < len(word_list_bip39):
-            print(f"{format(n, '011b')} {str(n).rjust(4)} {word_list_bip39[n]}")
+            print(f"{str(i+1).rjust(2)} {format(n, '011b')} {str(n).rjust(4)} {word_list_bip39[n]}")
         else:
             print(f"{format(n, '011b')} {x}")
             # print(f"{str(i+1).rjust(2)} {word_list_bip39[n]}")
@@ -107,8 +111,10 @@ def isValidMnemonic(wordlist):
     n_hex_digit = int(len(wordlist)*11/4)
     bigNum = BigNum(wordlist)
     nhex = format(bigNum, f'0{n_hex_digit}x') # include leading zero if needed
-    h = hashlib.sha256(binascii.unhexlify(nhex[:-checksum_length(wordlist)])).hexdigest()
-    return h[0] == nhex[-1]
+    chklen = checksum_length(wordlist)
+    h = hashlib.sha256(binascii.unhexlify(nhex[:-chklen])).hexdigest()
+    # return h[0] == nhex[-1]
+    return h[:chklen] == nhex[-chklen:]
 
 def findTwelfthWords(wordlist): # trova le 12° parole valide 
     n=0
@@ -119,20 +125,21 @@ def findTwelfthWords(wordlist): # trova le 12° parole valide
             n = n+1
             print(n, ' '.join(new_wordlist))
 
-def dropChecksum(word): # converte la parola in binario, rimuove il checksum, restituisce la parola senza il checksum
+def dropChecksum(word, l = 4): # converte la parola in binario, rimuove il checksum, restituisce la parola senza il checksum
     v12th = ToNum(word)
     binstr = format(v12th, '011b')
-    l = 4 # checksum_length
     return binstr[0:-l]
 
 def findChecksum(wordlist):
-    w12th = dropChecksum(wordlist[11])
+    last_word = dropChecksum(wordlist[-1])
+    l = checksum_length(wordlist) * 4 # moltiplica per 4 perché la funzione restituisce in hex e serve in bit
     for word in word_list_bip39:
-        if dropChecksum(word) == w12th:
+        if dropChecksum(word, l) == last_word:
             new_wordlist = wordlist.copy()
             new_wordlist[11] = word
             if isValidMnemonic(new_wordlist):
-                print(' '.join(new_wordlist))
+                # print(' '.join(new_wordlist))
+                return new_wordlist
 
 def ElaboraMnemonic(mnemonic_string, args):
     if isinstance(mnemonic_string, str):
@@ -141,16 +148,16 @@ def ElaboraMnemonic(mnemonic_string, args):
         mnemonic_wordlist = mnemonic_string
     # else:
     #     print("La variabile non è né una stringa né una lista.")
-    printMnemonic(mnemonic_wordlist)
     if len(mnemonic_wordlist) == 1:
         pass
     elif len(mnemonic_wordlist) == 11:
         findTwelfthWords(mnemonic_wordlist)
     else:
         if args.checksum:
-            findChecksum(mnemonic_wordlist)
-        else:
-            print("valid" if isValidMnemonic(mnemonic_wordlist) else "non valid")
+            mnemonic_wordlist = findChecksum(mnemonic_wordlist)
+    printMnemonic(mnemonic_wordlist)
+    if len(mnemonic_wordlist) in [12,24]:
+        print("valid" if isValidMnemonic(mnemonic_wordlist) else "NON valid")
     if args.glyph:
         bitcan.print_bitcan_glyph_array([ToNum(w) for w in mnemonic_wordlist])
 
@@ -183,7 +190,7 @@ if __name__ == "__main__":
 
     parser.add_argument('-i', '--input', action='store_true', help='enter the words')
 
-    parser.add_argument('-g', '--glyph', action='store_true', help='draw the bitcan glyph')
+    parser.add_argument('-g', '--glyph', action='store_true', help='draw the bitcan.world glyph')
 
     parser.add_argument('-c', '--checksum', action='store_true', help='find the checksum in the last word')
 
