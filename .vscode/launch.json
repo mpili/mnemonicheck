@@ -10,7 +10,8 @@
 			"request": "launch",
 			"program": "${file}",
 			"console": "integratedTerminal",
-			"args": ["-g", "-l", "powder", "door", "become", "soldier", "broccoli", "surface", "original", "flash", "regular", "quality", "ensure", "disorder", "such", "flee", "room", "uniform", "scan", "sport", "drift", "ranch", "duty", "radar", "giraffe", "decade"], // Inserisci qui i tuoi parametri personalizzati
+			// "args": ["-g", "-l", "powder", "door", "become", "soldier", "broccoli", "surface", "original", "flash", "regular", "quality", "ensure", "disorder", "such", "flee", "room", "uniform", "scan", "sport", "drift", "ranch", "duty", "radar", "giraffe", "decade"], // Inserisci qui i tuoi parametri personalizzati
+			"args": ["-c", "-g", "-l", "11101001110", "00000010111", "11101110100", "00100110011","11010111001","10110101100","01111111010","11101110111","01101111000","00011000011","11111100000","00000000000"]
             
 		}
 	]

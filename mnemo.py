@@ -3,6 +3,8 @@
 """
 Autore: Mauro Pili
 Data: 2024-03-21
+
+ultima modifica: 2024-03-29
 """
 
 import argparse
@@ -87,6 +89,12 @@ def check_word_present_in_bip39(word):
     if word not in word_list_bip39:
         raise ValueError(f"'{word}' is not present in the BIP-0039 word list")
 
+def BigNum(wordlist): # in hex characters
+    bigNum = 0
+    for word in wordlist:
+        bigNum = (bigNum<<11) + ToNum(word)
+    return bigNum
+
 def printMnemonic(wordlist):
     for i in range(len(wordlist)):
         x = wordlist[i]
@@ -96,16 +104,14 @@ def printMnemonic(wordlist):
         else:
             print(f"{format(n, '011b')} {x}")
             # print(f"{str(i+1).rjust(2)} {word_list_bip39[n]}")
+    print(hex(BigNum(wordlist)))
 
 def checksum_length(wordlist): # in hex characters
+    # 128 bits + 4 bits checksum = 132 bits; 256 bits + 8 bits checksum = 264 bits
+    # 132 / 4 = 33 ; 264 / 4 = 66
     num_bits = len(wordlist)/3
     return int(num_bits/4)
 
-def BigNum(wordlist): # in hex characters
-    bigNum = 0
-    for word in wordlist:
-        bigNum = (bigNum<<11) + ToNum(word)
-    return bigNum
 
 def isValidMnemonic(wordlist):
     n_hex_digit = int(len(wordlist)*11/4)
@@ -172,7 +178,7 @@ def main(args):
     elif args.lista:
         mnemonic_string = args.lista
     elif args.input:
-        mnemonic_string = input("Enter the 12 or 11 mnemonic words: ")
+        mnemonic_string = input("Enter the 12 or 11, 24 or 23 mnemonic words: ")
     ElaboraMnemonic(mnemonic_string, args)
 
 
